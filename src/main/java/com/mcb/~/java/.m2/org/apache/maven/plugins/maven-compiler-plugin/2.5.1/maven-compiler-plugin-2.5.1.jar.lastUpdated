@@ -1,0 +1,9 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Sat Sep 05 14:37:40 CEST 2015
+http\://repo.maven.apache.org/maven2/.lastUpdated=1441456660632
+@default-http\://www.ekr.it\:8088/archiva/repository/internal/.lastUpdated=1441456659295
+http\://repository.jboss.com/maven2/.lastUpdated=1441456659910
+http\://www.ekr.it\:8088/archiva/repository/internal/.error=Could not transfer artifact org.apache.maven.plugins\:maven-compiler-plugin\:jar\:2.5.1 from/to ekr-archiva-plugins (http\://www.ekr.it\:8088/archiva/repository/internal)\: Failed to transfer file\: http\://www.ekr.it\:8088/archiva/repository/internal/org/apache/maven/plugins/maven-compiler-plugin/2.5.1/maven-compiler-plugin-2.5.1.jar. Return code is\: 500 , ReasonPhrase\:Unable to fetch artifact resource..
+http\://repository.jboss.com/maven2/.error=
+http\://snapshots.jboss.org/maven2/.error=
+http\://snapshots.jboss.org/maven2/.lastUpdated=1441456660319

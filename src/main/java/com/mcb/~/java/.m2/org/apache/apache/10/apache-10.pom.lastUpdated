@@ -1,0 +1,9 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Sat Sep 05 14:37:35 CEST 2015
+http\://repo.maven.apache.org/maven2/.lastUpdated=1441456655800
+@default-http\://www.ekr.it\:8088/archiva/repository/internal/.lastUpdated=1441456653739
+http\://repository.jboss.com/maven2/.lastUpdated=1441456654175
+http\://www.ekr.it\:8088/archiva/repository/internal/.error=Could not transfer artifact org.apache\:apache\:pom\:10 from/to ekr-archiva-plugins (http\://www.ekr.it\:8088/archiva/repository/internal)\: Failed to transfer file\: http\://www.ekr.it\:8088/archiva/repository/internal/org/apache/apache/10/apache-10.pom. Return code is\: 500 , ReasonPhrase\:Server Error.
+http\://repository.jboss.com/maven2/.error=
+http\://snapshots.jboss.org/maven2/.error=
+http\://snapshots.jboss.org/maven2/.lastUpdated=1441456655609

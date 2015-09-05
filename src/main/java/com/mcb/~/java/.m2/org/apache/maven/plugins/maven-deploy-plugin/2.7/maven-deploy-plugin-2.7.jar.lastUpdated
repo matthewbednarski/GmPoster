@@ -1,0 +1,9 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Sat Sep 05 16:06:05 CEST 2015
+http\://repo.maven.apache.org/maven2/.lastUpdated=1441461965131
+@default-http\://www.ekr.it\:8088/archiva/repository/internal/.lastUpdated=1441461964880
+http\://www.ekr.it\:8088/archiva/repository/internal/.error=Could not transfer artifact org.apache.maven.plugins\:maven-deploy-plugin\:jar\:2.7 from/to ekr-archiva-plugins (http\://www.ekr.it\:8088/archiva/repository/internal)\: Failed to transfer file\: http\://www.ekr.it\:8088/archiva/repository/internal/org/apache/maven/plugins/maven-deploy-plugin/2.7/maven-deploy-plugin-2.7.jar. Return code is\: 500 , ReasonPhrase\:Unable to fetch artifact resource..
+http\://repository.jboss.com/maven2/.lastUpdated=1441461964219
+http\://repository.jboss.com/maven2/.error=
+http\://snapshots.jboss.org/maven2/.lastUpdated=1441461964633
+http\://snapshots.jboss.org/maven2/.error=
