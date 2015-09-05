@@ -3,6 +3,8 @@ package com.mcb.owner;
 
 import org.aeonbits.owner.Config;
 
+import javax.servlet.http.HttpServletResponse;
+
 public interface Application extends Config {
 
 	@Key( "server.port" )
@@ -30,4 +32,8 @@ public interface Application extends Config {
 
     @Key( "app.remote.auth.header" )
     String remoteAuthHeaderName();
+
+    @Key( "app.remote.status.expected" )
+    @DefaultValue("201")
+    int remoteStatusExpected();
 }

@@ -1,18 +1,22 @@
 package com.mcb;
 
 import com.mcb.owner.Application;
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.*;
 import com.ning.http.client.Response;
 import com.ning.http.client.multipart.FilePart;
 import org.aeonbits.owner.ConfigFactory;
+import org.jboss.netty.handler.codec.http.*;
+import spark.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.sql.Statement;
 import java.util.Base64;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static spark.Spark.*;
 
@@ -42,27 +46,54 @@ public class App {
         get("/" + this.cfg.routeName(), (req, res) -> "Hello World");
         post("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
-            File toPost = new File(cfg.fileToPost());
-            ListenableFuture<Response> future = postIt(cfg.remoteUrl(), toPost);
-            Response r = future.get();
-            logger.info(r.getResponseBody());
-            r.getCookies().stream().map(cookie -> {
-                res.cookie(cookie.getName(), cookie.getValue());
-                return res;
-            });
-            res.status(200);
-            res.body("Got it!!!");
-            res.type("text/plain");
-            return res.body();
+            ListenableFuture<Response> future = postIt(res);
+            if(future != null) {
+                Response r = future.get();
+                r.getCookies().stream().map(cookie -> {
+                    res.cookie(cookie.getName(), cookie.getValue());
+                    return res;
+                });
+                r.getHeaders().keySet().stream()
+                        .map(h -> {
+                            String v = r.getHeaders(h).stream().map(hv -> hv)
+                                    .collect(Collectors.joining("; "));
+                            res.header(h, v);
+                            return res;
+                        });
+                res.status(200);
+                res.body(r.getResponseBody());
+                res.type(r.getContentType());
+                if (r.getStatusCode() == this.cfg.remoteStatusExpected()) {
+                    logger.info(r.getResponseBody());
+                    res.status(200);
+                } else {
+                    logger.warning(r.getResponseBody());
+                    res.status(r.getStatusCode());
+                }
+                return res.body();
+            }else {
+                return "";
+            }
         });
     }
 
     AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
+    /***
+     * Returns the name of the Authorization header
+     * @return String name of the Authorization Header
+     */
     private String getAuthHeaderName() {
         return cfg.remoteAuthHeaderName();
     }
 
+    /***
+     * Returns a Credential to be used in a designated Authorization header
+     *
+     * TODO: implement other Auth types
+     *
+     * @return String value of the Authorization Header
+     */
     private String getAuthHeaderValue() {
         String type = cfg.remoteAuthType();
         if (type != null && "BASIC".toLowerCase().equals(type.toLowerCase())) {
@@ -75,11 +106,29 @@ public class App {
         return null;
     }
 
-    private ListenableFuture<Response> postIt(String url, File file) {
-        ListenableFuture<Response> result = asyncHttpClient.preparePost(url)
-                .addHeader(getAuthHeaderName(), getAuthHeaderValue())
-                .addBodyPart(new FilePart(file.getName(), file))
-                .execute(new AsyncCompletionHandler<Response>() {
+    /***
+     * Posts to the indicated url
+     *
+     * TODO: implement other Auth types
+     *
+     * @return a @link ListenableFuture<Response>
+     * @param res
+     */
+    private ListenableFuture<Response> postIt(spark.Response res) {
+
+
+        File toPost = new File(cfg.fileToPost());
+        if(!toPost.exists()){
+           res.status(HttpServletResponse.SC_NO_CONTENT);
+            return null;
+        }
+        String url = cfg.remoteUrl();
+        AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(url)
+        .addBodyPart(new FilePart(toPost.getName(), toPost));
+        if(getAuthHeaderName() != null){
+                    builder.addHeader(getAuthHeaderName(), getAuthHeaderValue());
+        }
+        ListenableFuture<Response> result = builder.execute(new AsyncCompletionHandler<Response>() {
                     @Override
                     public Response onCompleted(Response response) throws Exception {
                         return response;
