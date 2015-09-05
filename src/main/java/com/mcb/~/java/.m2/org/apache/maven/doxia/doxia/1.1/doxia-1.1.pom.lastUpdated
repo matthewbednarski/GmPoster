@@ -1,9 +1,0 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Sat Sep 05 16:06:58 CEST 2015
-http\://repo.maven.apache.org/maven2/.lastUpdated=1441462018122
-@default-http\://www.ekr.it\:8088/archiva/repository/internal/.lastUpdated=1441462017953
-http\://repository.jboss.com/maven2/.lastUpdated=1441462016751
-http\://www.ekr.it\:8088/archiva/repository/internal/.error=Could not transfer artifact org.apache.maven.doxia\:doxia\:pom\:1.1 from/to ekr-archiva-plugins (http\://www.ekr.it\:8088/archiva/repository/internal)\: Failed to transfer file\: http\://www.ekr.it\:8088/archiva/repository/internal/org/apache/maven/doxia/doxia/1.1/doxia-1.1.pom. Return code is\: 500 , ReasonPhrase\:Unable to fetch artifact resource..
-http\://repository.jboss.com/maven2/.error=
-http\://snapshots.jboss.org/maven2/.lastUpdated=1441462017408
-http\://snapshots.jboss.org/maven2/.error=

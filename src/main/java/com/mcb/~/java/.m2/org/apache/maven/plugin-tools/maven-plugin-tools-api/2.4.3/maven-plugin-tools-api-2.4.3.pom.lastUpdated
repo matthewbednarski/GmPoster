@@ -1,9 +1,0 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Sat Sep 05 16:07:22 CEST 2015
-http\://repo.maven.apache.org/maven2/.lastUpdated=1441462042593
-@default-http\://www.ekr.it\:8088/archiva/repository/internal/.lastUpdated=1441462042473
-http\://repository.jboss.com/maven2/.lastUpdated=1441462041911
-http\://www.ekr.it\:8088/archiva/repository/internal/.error=Could not transfer artifact org.apache.maven.plugin-tools\:maven-plugin-tools-api\:pom\:2.4.3 from/to ekr-archiva-plugins (http\://www.ekr.it\:8088/archiva/repository/internal)\: Failed to transfer file\: http\://www.ekr.it\:8088/archiva/repository/internal/org/apache/maven/plugin-tools/maven-plugin-tools-api/2.4.3/maven-plugin-tools-api-2.4.3.pom. Return code is\: 500 , ReasonPhrase\:Unable to fetch artifact resource..
-http\://repository.jboss.com/maven2/.error=
-http\://snapshots.jboss.org/maven2/.lastUpdated=1441462042325
-http\://snapshots.jboss.org/maven2/.error=
