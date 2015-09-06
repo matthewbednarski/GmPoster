@@ -43,9 +43,11 @@ public class App {
             enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
         }
         get("/" + this.cfg.routeName() + "/test", (req, res) -> {
-
-
             return "test request, endpoint is up";
+        });
+        get("/" + this.cfg.routeName() + "/stop", (req, res) -> {
+            stop();
+            return "stopping";
         });
         get("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
