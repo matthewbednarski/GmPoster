@@ -36,50 +36,50 @@ import org.aeonbits.owner.Config;
         "classpath:com/mcb/owner/Application.properties" })
 public interface Application extends Config {
 
-	  @Key( "server.port" )
-	  int port();
-
+    @Key( "server.port" )
+    int port();
+    
     @Key( "server.cors.disable" )
     @DefaultValue( "False" )
     Boolean disableCors();
-
+    
     @Key( "server.cors.allow.origin" )
     @DefaultValue( "*" )
     String corsAllowOrigin();
-
+    
     @Key( "server.cors.request.method" )
     @DefaultValue( "*" )
     String corsRequestMethod();
-
+    
     @Key( "server.cors.allow.headers" )
     @DefaultValue( "*" )
     String corsAllowHeaders();
-
+    
     @Key( "app.route.name" )
     @DefaultValue( "route" )
     String routeName();
-
+    
     @Key( "app.file.to.post" )
-	  String fileToPost();
-
+    String fileToPost();
+    
     @Key( "app.remote.url" )
-	  String remoteUrl();
-
+    String remoteUrl();
+    
     @Key( "app.remote.auth.type" )
-	  String remoteAuthType();
-
+    String remoteAuthType();
+    
     @Key( "app.remote.auth.username" )
-	  String remoteAuthUsername();
-
+    String remoteAuthUsername();
+    
     @Key( "app.remote.auth.password" )
-	  String remoteAuthPassword();
-
+    String remoteAuthPassword();
+    
     @Key( "app.remote.auth.header" )
     String remoteAuthHeaderName();
-
+    
     @Key( "app.remote.auth.header.value" )
     String remoteAuthHeaderValue();
-
+    
     @Key( "app.remote.status.expected" )
     @DefaultValue("201")
     int remoteStatusExpected();
