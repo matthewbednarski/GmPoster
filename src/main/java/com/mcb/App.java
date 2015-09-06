@@ -43,7 +43,10 @@ public class App {
     public void bootstrap() {
         System.out.println("Server Port" + +this.cfg.port());
         port(this.cfg.port());
-        get("/" + this.cfg.routeName(), (req, res) -> "Hello World");
+        if(!this.cfg.disableCors()){
+           // Adds CORS headers
+           enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
+        }
         post("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
             ListenableFuture<Response> future = postIt(res);
@@ -75,6 +78,15 @@ public class App {
                 return "";
             }
         });
+    }
+
+    private void enableCORS(final String origin, final String methods, final String headers) {
+        before((req, res) -> {
+                    res.header("Access-Control-Allow-Origin", origin);
+                    res.header("Access-Control-Request-Method", methods);
+                    res.header("Access-Control-Allow-Headers", headers);
+                }
+        );
     }
 
     AsyncHttpClient asyncHttpClient = new AsyncHttpClient();

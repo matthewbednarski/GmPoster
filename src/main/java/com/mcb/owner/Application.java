@@ -3,16 +3,31 @@ package com.mcb.owner;
 
 import org.aeonbits.owner.Config;
 
-import javax.servlet.http.HttpServletResponse;
-
+@Config.Sources({
+        "file:gm.properties",
+        "file:~/.gm.properties",
+        "file:/etc/gm.properties",
+        "classpath:com/mcb/owner/Application.properties" })
 public interface Application extends Config {
 
 	@Key( "server.port" )
-	@DefaultValue( "6547" )
 	int port();
 
-    @Key( "server.auth.header" )
-    String authHeader();
+    @Key( "server.cors.disable" )
+    @DefaultValue( "False" )
+    Boolean disableCors();
+
+    @Key( "server.cors.allow.origin" )
+    @DefaultValue( "*" )
+    String corsAllowOrigin();
+
+    @Key( "server.cors.request.method" )
+    @DefaultValue( "*" )
+    String corsRequestMethod();
+
+    @Key( "server.cors.allow.headers" )
+    @DefaultValue( "*" )
+    String corsAllowHeaders();
 
     @Key( "app.route.name" )
     @DefaultValue( "route" )
@@ -36,4 +51,6 @@ public interface Application extends Config {
     @Key( "app.remote.status.expected" )
     @DefaultValue("201")
     int remoteStatusExpected();
+
+
 }
