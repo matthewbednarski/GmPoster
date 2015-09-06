@@ -22,6 +22,8 @@ Configuration
 
 This is the [Owner Config](http://owner.aeonbits.org/docs/loading-strategies/) interface from which the settings are taken.
 
+src/main/java/com/mcb/owner/Application.java
+
 ```java
 package com.mcb.owner;
 
@@ -84,6 +86,8 @@ public interface Application extends Config {
 }
 
 ```
+
+src/main/resources/com/mcb/owner/Application.properties
 
 ```properties
 #################################################################
