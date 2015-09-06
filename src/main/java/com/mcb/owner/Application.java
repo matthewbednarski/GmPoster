@@ -47,6 +47,8 @@ public interface Application extends Config {
 
     @Key( "app.remote.auth.header" )
     String remoteAuthHeaderName();
+    @Key( "app.remote.auth.header.value" )
+    String remoteAuthHeaderValue();
 
     @Key( "app.remote.status.expected" )
     @DefaultValue("201")

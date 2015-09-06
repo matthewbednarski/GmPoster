@@ -2,18 +2,13 @@ package com.mcb;
 
 import com.mcb.owner.Application;
 import com.ning.http.client.*;
-import com.ning.http.client.Response;
 import com.ning.http.client.multipart.FilePart;
 import org.aeonbits.owner.ConfigFactory;
-import org.jboss.netty.handler.codec.http.*;
-import spark.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.sql.Statement;
 import java.util.Base64;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,14 +38,14 @@ public class App {
     public void bootstrap() {
         System.out.println("Server Port" + +this.cfg.port());
         port(this.cfg.port());
-        if(!this.cfg.disableCors()){
-           // Adds CORS headers
-           enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
+        if (!this.cfg.disableCors()) {
+            // Adds CORS headers
+            enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
         }
         post("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
-            ListenableFuture<Response> future = postIt(res);
-            if(future != null) {
+            ListenableFuture<Response> future = postIt();
+            if (future != null) {
                 Response r = future.get();
                 r.getCookies().stream().map(cookie -> {
                     res.cookie(cookie.getName(), cookie.getValue());
@@ -74,7 +69,9 @@ public class App {
                     res.status(r.getStatusCode());
                 }
                 return res.body();
-            }else {
+            } else {
+                logger.warning("no content to be processed; check if the file: " + cfg.fileToPost() + " exists and is readable.");
+                res.status(HttpServletResponse.SC_NO_CONTENT);
                 return "";
             }
         });
@@ -93,6 +90,7 @@ public class App {
 
     /***
      * Returns the name of the Authorization header
+     *
      * @return String name of the Authorization Header
      */
     private String getAuthHeaderName() {
@@ -101,61 +99,90 @@ public class App {
 
     /***
      * Returns a Credential to be used in a designated Authorization header
-     *
+     * <p>
      * TODO: implement other Auth types
      *
      * @return String value of the Authorization Header
      */
     private String getAuthHeaderValue() {
-        String type = cfg.remoteAuthType();
-        if (type != null && "BASIC".toLowerCase().equals(type.toLowerCase())) {
-            String user = cfg.remoteAuthUsername();
-            String pass = cfg.remoteAuthPassword();
-            String encoded = Base64.getEncoder().encodeToString((user + ':' + pass).getBytes(StandardCharsets.UTF_8));
+        return cfg.remoteAuthHeaderValue();
+    }
 
-            return "BASIC " + encoded;
+    /***
+     * Returns a Credential to be used in a designated Authorization header
+     * <p>
+     * TODO: implement other Auth types
+     *
+     * @return @link Realm object for use in Authentication
+     */
+    private Realm getAuthRealm() {
+        String type = cfg.remoteAuthType();
+        if (type != null) {
+            if ("BASIC".toLowerCase().equals(type.toLowerCase())) {
+                String user = cfg.remoteAuthUsername();
+                String pass = cfg.remoteAuthPassword();
+                String encoded = Base64.getEncoder().encodeToString((user + ':' + pass).getBytes(StandardCharsets.UTF_8));
+
+                Realm.RealmBuilder realm = new Realm.RealmBuilder();
+                realm.setPassword(pass)
+                        .setPrincipal(user)
+                        .setScheme(Realm.AuthScheme.BASIC)
+                        .setUsePreemptiveAuth(true);
+                return realm.build();
+            }
+            if ("DIGEST".toLowerCase().equals(type.toLowerCase())) {
+                String user = cfg.remoteAuthUsername();
+                String pass = cfg.remoteAuthPassword();
+                String encoded = Base64.getEncoder().encodeToString((user + ':' + pass).getBytes(StandardCharsets.UTF_8));
+
+                Realm.RealmBuilder realm = new Realm.RealmBuilder();
+                realm.setPassword(pass)
+                        .setPrincipal(user)
+                        .setScheme(Realm.AuthScheme.DIGEST)
+                        .setUsePreemptiveAuth(true);
+                return realm.build();
+            }
         }
         return null;
     }
 
     /***
      * Posts to the indicated url
-     *
+     * <p>
      * TODO: implement other Auth types
      *
      * @return a @link ListenableFuture<Response>
-     * @param res
      */
-    private ListenableFuture<Response> postIt(spark.Response res) {
-
-
+    private ListenableFuture<Response> postIt() {
         File toPost = new File(cfg.fileToPost());
-        if(!toPost.exists()){
-           res.status(HttpServletResponse.SC_NO_CONTENT);
+        if (!toPost.exists()) {
             return null;
         }
         String url = cfg.remoteUrl();
         AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(url)
-        .addBodyPart(new FilePart(toPost.getName(), toPost));
-        if(getAuthHeaderName() != null){
-                    builder.addHeader(getAuthHeaderName(), getAuthHeaderValue());
+                .addBodyPart(new FilePart(toPost.getName(), toPost));
+        Realm realm = getAuthRealm();
+        if (realm != null) {
+            builder.setRealm(realm);
+        } else if (getAuthHeaderValue() != null && getAuthHeaderName() != null) {
+            builder.addHeader(getAuthHeaderName(), getAuthHeaderValue());
         }
         ListenableFuture<Response> result = builder.execute(new AsyncCompletionHandler<Response>() {
-                    @Override
-                    public Response onCompleted(Response response) throws Exception {
-                        return response;
-                    }
+            @Override
+            public Response onCompleted(Response response) throws Exception {
+                return response;
+            }
 
-                    @Override
-                    public void onThrowable(Throwable t) {
-                        // Something wrong happened.
-                        if (logger.isLoggable(Level.FINER)) {
-                            logger.log(Level.WARNING, t.getLocalizedMessage(), t);
-                        } else {
-                            logger.warning(t.getLocalizedMessage());
-                        }
-                    }
-                });
+            @Override
+            public void onThrowable(Throwable t) {
+                // Something wrong happened.
+                if (logger.isLoggable(Level.FINER)) {
+                    logger.log(Level.WARNING, t.getLocalizedMessage(), t);
+                } else {
+                    logger.warning(t.getLocalizedMessage());
+                }
+            }
+        });
         return result;
     }
 }
