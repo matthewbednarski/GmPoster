@@ -3,6 +3,8 @@ GmPoster
 
 A [Spark Framework](http://sparkjava.com/) app for posting local files to a remote server for locally installed HTML5 apps.
 
+It runs on [Java8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) and uses [Owner](http://owner.aeonbits.org), [Async-Http-Client](https://github.com/AsyncHttpClient/async-http-client) and [Netty](http://netty.io/).
+
 Build
 -----
 
