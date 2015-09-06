@@ -42,43 +42,54 @@ public class App {
             // Adds CORS headers
             enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
         }
-        get("/" + this.cfg.routeName()+ "/test", (req, res) -> {
+        get("/" + this.cfg.routeName() + "/test", (req, res) -> {
 
 
-			return "test request, endpoint is up";
-		});
+            return "test request, endpoint is up";
+        });
         get("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
-            ListenableFuture<Response> future = postIt();
-            if (future != null) {
-                Response r = future.get();
-                r.getCookies().stream().map(cookie -> {
-                    res.cookie(cookie.getName(), cookie.getValue());
-                    return res;
-                });
-                r.getHeaders().keySet().stream()
-                        .map(h -> {
-                            String v = r.getHeaders(h).stream().map(hv -> hv)
-                                    .collect(Collectors.joining("; "));
-                            res.header(h, v);
-                            return res;
-                        });
-                res.status(200);
-                res.body(r.getResponseBody());
-                res.type(r.getContentType());
-                if (r.getStatusCode() == this.cfg.remoteStatusExpected()) {
-                    logger.info(r.getResponseBody());
-                    res.status(200);
-                } else {
-                    logger.warning(r.getResponseBody());
-                    res.status(r.getStatusCode());
-                }
-                return res.body();
-            } else {
+            String file = req.queryParams("file");
+            if (file == null || file == "") {
+                file = cfg.fileToPost();
+            }
+            File toPost = new File(file);
+            if (!toPost.exists()) {
                 logger.warning("no content to be processed; check if the file: " + cfg.fileToPost() + " exists and is readable.");
                 res.status(HttpServletResponse.SC_NO_CONTENT);
-                return "";
+            } else {
+                String url = req.queryParams("post_url");
+                if (url == null || url == "") {
+                    url = cfg.remoteUrl();
+                }
+                ListenableFuture<Response> future = postIt(toPost, url);
+                if (future != null) {
+                    Response r = future.get();
+                    r.getCookies().stream().map(cookie -> {
+                        res.cookie(cookie.getName(), cookie.getValue());
+                        return res;
+                    });
+                    r.getHeaders().keySet().stream()
+                            .map(h -> {
+                                String v = r.getHeaders(h).stream().map(hv -> hv)
+                                        .collect(Collectors.joining("; "));
+                                res.header(h, v);
+                                return res;
+                            });
+                    res.status(200);
+                    res.body(r.getResponseBody());
+                    res.type(r.getContentType());
+                    if (r.getStatusCode() == this.cfg.remoteStatusExpected()) {
+                        logger.info(r.getResponseBody());
+                        res.status(200);
+                    } else {
+                        logger.warning(r.getResponseBody());
+                        res.status(r.getStatusCode());
+                    }
+                    return res.body();
+                }
             }
+            return "";
         });
     }
 
@@ -156,16 +167,12 @@ public class App {
      * <p>
      * TODO: implement other Auth types
      *
+     * @param file
      * @return a @link ListenableFuture<Response>
      */
-    private ListenableFuture<Response> postIt() {
-        File toPost = new File(cfg.fileToPost());
-        if (!toPost.exists()) {
-            return null;
-        }
-        String url = cfg.remoteUrl();
+    private ListenableFuture<Response> postIt(File file, String url) {
         AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(url)
-                .addBodyPart(new FilePart(toPost.getName(), toPost));
+                .addBodyPart(new FilePart(file.getName(), file));
         Realm realm = getAuthRealm();
         if (realm != null) {
             builder.setRealm(realm);
