@@ -42,7 +42,12 @@ public class App {
             // Adds CORS headers
             enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
         }
-        post("/" + this.cfg.routeName(), (req, res) -> {
+        get("/" + this.cfg.routeName()+ "/test", (req, res) -> {
+
+
+			return "test request, endpoint is up";
+		});
+        get("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
             ListenableFuture<Response> future = postIt();
             if (future != null) {
