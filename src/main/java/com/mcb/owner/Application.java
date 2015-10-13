@@ -3,6 +3,8 @@ package com.mcb.owner;
 
 import org.aeonbits.owner.Config;
 
+import java.nio.file.Path;
+
 @Config.Sources({
         "file:gm.properties",
         "file:~/.gm.properties",
@@ -55,4 +57,7 @@ public interface Application extends Config {
     int remoteStatusExpected();
 
 
+    @Key( "files.root" )
+    @DefaultValue("${HOME}/${app.route.name}/files")
+    String filesRoot();
 }

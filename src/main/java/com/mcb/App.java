@@ -7,10 +7,11 @@ import org.aeonbits.owner.ConfigFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 
 import static spark.Spark.*;
@@ -24,6 +25,13 @@ public class App {
     private final Application cfg;
 
     public static void main(String[] args) {
+        try( InputStream is = App.class.getClassLoader().getResourceAsStream("logging.properties")) {
+            if(is != null) {
+                LogManager.getLogManager().readConfiguration(is);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Logger.getGlobal().setLevel(Level.INFO);
         App app = new App(args);
         app.bootstrap();
@@ -31,17 +39,18 @@ public class App {
 
     public App(String... args) {
         this.args = args;
-        this.cfg = ConfigFactory.create(Application.class);
+        this.cfg = ConfigFactory.create(Application.class, System.getProperties(), System.getenv());
 
     }
-
     public void bootstrap() {
-        System.out.println("Server Port" + +this.cfg.port());
+        logger.info("Server Port" + +this.cfg.port());
         port(this.cfg.port());
         if (!this.cfg.disableCors()) {
             // Adds CORS headers
             enableCORS(this.cfg.corsAllowOrigin(), this.cfg.corsRequestMethod(), this.cfg.corsAllowHeaders());
         }
+        HttpFiles files = new HttpFiles();
+        files.setup();
         get("/" + this.cfg.routeName() + "/test", (req, res) -> {
             return "test request, endpoint is up";
         });
