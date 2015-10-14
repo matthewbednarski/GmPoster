@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.jasypt:jasypt:lite:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.3.1" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-jdk14:1.7.7" level="project" />
@@ -18,17 +19,21 @@
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.aeonbits.owner:owner-java8:1.0.9" level="project" />
     <orderEntry type="library" name="Maven: org.aeonbits.owner:owner:1.0.9" level="project" />
-    <orderEntry type="library" name="Maven: com.sparkjava:spark-core:2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.7" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.0.2.v20130417" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.0.2.v20130417" level="project" />
+    <orderEntry type="library" name="Maven: com.sparkjava:spark-core:2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-server:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-common:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-client:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-servlet:9.3.2.v20150730" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-api:9.3.2.v20150730" level="project" />
     <orderEntry type="library" name="Maven: com.ning:async-http-client:1.9.31" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty:3.10.4.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
