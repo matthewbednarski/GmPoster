@@ -7,8 +7,11 @@ import org.aeonbits.owner.ConfigFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -19,7 +22,7 @@ import static spark.Spark.*;
  * GmPoster App
  */
 public class App {
-    Logger logger = Logger.getLogger(App.class.getName());
+    static Logger logger = Logger.getLogger(App.class.getName());
     private final String[] args;
     private final Application cfg;
 
@@ -33,6 +36,55 @@ public class App {
         this.args = args;
         this.cfg = ConfigFactory.create(Application.class);
 
+    }
+
+    private static File getFile(spark.Request req, Application cfg) {
+        String file = req.queryParams("file");
+        if (file == null || file == "") {
+            file = cfg.fileToPost();
+        }
+        return new File(file);
+    }
+
+    private static String getUrl(spark.Request req, Application cfg) {
+        String url = req.queryParams("post_url");
+        if (url == null || url == "") {
+            url = cfg.remoteUrl();
+        }
+        return url;
+    }
+
+    private static Response processResponse(Future<Response> future, spark.Request req, spark.Response res, Application cfg) throws ExecutionException, InterruptedException {
+        if (future != null) {
+            Response r = future.get();
+            r.getCookies().stream().map(cookie -> {
+                res.cookie(cookie.getName(), cookie.getValue());
+                return res;
+            });
+            r.getHeaders().keySet().stream()
+                    .map(h -> {
+                        String v = r.getHeaders(h).stream().map(hv -> hv)
+                                .collect(Collectors.joining("; "));
+                        res.header(h, v);
+                        return res;
+                    });
+            res.status(200);
+            res.type(r.getContentType());
+            try {
+                res.body(r.getResponseBody());
+            } catch (IOException ex) {
+                logger.log(Level.FINER, ex.getLocalizedMessage(), ex);
+            }
+            if (r.getStatusCode() == cfg.remoteStatusExpected()) {
+                logger.info(res.body());
+                res.status(200);
+            } else {
+                logger.info(res.body());
+                res.status(r.getStatusCode());
+            }
+            return r;
+        }
+        return null;
     }
 
     public void bootstrap() {
@@ -49,47 +101,36 @@ public class App {
             stop();
             return "stopping";
         });
+        post("/" + this.cfg.routeName(), (req, res) -> {
+            logger.info("Authorization: " + req.headers("Authorization"));
+            req.headers().stream().map( x -> {
+                logger.info(x + ": " + req.headers(x));
+                return x;
+            });
+            logger.info(req.body());
+            return "All good";
+        });
         get("/" + this.cfg.routeName(), (req, res) -> {
             logger.log(Level.INFO, req.body());
-            String file = req.queryParams("file");
-            if (file == null || file == "") {
-                file = cfg.fileToPost();
-            }
-            File toPost = new File(file);
+            File toPost = getFile(req, cfg);
             if (!toPost.exists()) {
                 logger.warning("no content to be processed; check if the file: " + cfg.fileToPost() + " exists and is readable.");
                 res.status(HttpServletResponse.SC_NO_CONTENT);
             } else {
-                String url = req.queryParams("post_url");
-                if (url == null || url == "") {
-                    url = cfg.remoteUrl();
-                }
-                ListenableFuture<Response> future = postIt(toPost, url);
-                if (future != null) {
-                    Response r = future.get();
-                    r.getCookies().stream().map(cookie -> {
-                        res.cookie(cookie.getName(), cookie.getValue());
-                        return res;
-                    });
-                    r.getHeaders().keySet().stream()
-                            .map(h -> {
-                                String v = r.getHeaders(h).stream().map(hv -> hv)
-                                        .collect(Collectors.joining("; "));
-                                res.header(h, v);
-                                return res;
-                            });
-                    res.status(200);
-                    res.body(r.getResponseBody());
-                    res.type(r.getContentType());
-                    if (r.getStatusCode() == this.cfg.remoteStatusExpected()) {
-                        logger.info(r.getResponseBody());
-                        res.status(200);
-                    } else {
-                        logger.warning(r.getResponseBody());
-                        res.status(r.getStatusCode());
+                ListenableFuture<Response> future = null;
+                String customAuthHeader = req.headers(cfg.remoteAuthHeaderName());
+                if (!Utils.StringUtils.isBlank(customAuthHeader)) {
+                    String customAuthHeaderRename = cfg.remoteAuthHeaderRename();
+                    if (!Utils.StringUtils.isBlank(customAuthHeaderRename)) {
+                        future = postIt(toPost, getUrl(req, cfg), cfg.remoteAuthHeaderRename(), customAuthHeader);
+                    }else{
+                        future = postIt(toPost, getUrl(req, cfg), cfg.remoteAuthHeaderName(), customAuthHeader);
                     }
-                    return res.body();
+                }else{
+                    future = postIt(toPost, getUrl(req, cfg));
                 }
+                Response r = processResponse(future, req, res, cfg);
+                return res.body();
             }
             return "";
         });
@@ -164,6 +205,9 @@ public class App {
         return null;
     }
 
+    private ListenableFuture<Response> postIt(File file, String url) {
+        return this.postIt(file, url, null, null);
+    }
     /***
      * Posts to the indicated url
      * <p>
@@ -172,14 +216,18 @@ public class App {
      * @param file
      * @return a @link ListenableFuture<Response>
      */
-    private ListenableFuture<Response> postIt(File file, String url) {
+    private ListenableFuture<Response> postIt(File file, String url, String authHeaderName, String authHeaderValue) {
         AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(url)
                 .addBodyPart(new FilePart(file.getName(), file));
-        Realm realm = getAuthRealm();
-        if (realm != null) {
-            builder.setRealm(realm);
-        } else if (getAuthHeaderValue() != null && getAuthHeaderName() != null) {
-            builder.addHeader(getAuthHeaderName(), getAuthHeaderValue());
+        if(!Utils.StringUtils.isBlank(authHeaderName) && !Utils.StringUtils.isBlank(authHeaderValue)){
+            builder.addHeader(authHeaderName, authHeaderValue);
+        }else {
+            Realm realm = getAuthRealm();
+            if (realm != null) {
+                builder.setRealm(realm);
+            } else if (getAuthHeaderValue() != null && getAuthHeaderName() != null) {
+                builder.addHeader(getAuthHeaderName(), getAuthHeaderValue());
+            }
         }
         ListenableFuture<Response> result = builder.execute(new AsyncCompletionHandler<Response>() {
             @Override

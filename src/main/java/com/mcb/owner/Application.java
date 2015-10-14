@@ -2,13 +2,16 @@
 package com.mcb.owner;
 
 import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Mutable;
+import org.aeonbits.owner.Reloadable;
+import org.aeonbits.owner.Accessible;
 
 @Config.Sources({
         "file:gm.properties",
         "file:~/.gm.properties",
         "file:/etc/gm.properties",
         "classpath:com/mcb/owner/Application.properties" })
-public interface Application extends Config {
+public interface Application extends Accessible, Mutable, Reloadable, Config {
 
 	@Key( "server.port" )
 	int port();
@@ -45,6 +48,8 @@ public interface Application extends Config {
     @Key( "app.remote.auth.password" )
 	String remoteAuthPassword();
 
+    @Key( "app.remote.auth.header.rename" )
+    String remoteAuthHeaderRename();
     @Key( "app.remote.auth.header" )
     String remoteAuthHeaderName();
     @Key( "app.remote.auth.header.value" )
@@ -53,6 +58,5 @@ public interface Application extends Config {
     @Key( "app.remote.status.expected" )
     @DefaultValue("201")
     int remoteStatusExpected();
-
 
 }
