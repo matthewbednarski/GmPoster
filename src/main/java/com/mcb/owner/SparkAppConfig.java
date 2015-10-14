@@ -11,13 +11,18 @@ import java.util.concurrent.TimeUnit;
 
 
 @Sources({
-        "file:gm.properties",
-        "file:~/.gm.properties",
-        "file:/etc/gm.properties",
+        "file:${server.app.name}.properties",
+        "file:~/${server.app.name}.properties",
+        "file:/etc/${server.app.name}.properties",
+        "classpath:${server.app.name}.properties",
         "classpath:application.properties",
         "classpath:com/mcb/owner/SparkAppConfig.properties" })
 @HotReload(value = 500L, unit = TimeUnit.MILLISECONDS, type = HotReloadType.ASYNC)
 public interface SparkAppConfig extends org.aeonbits.owner.Config,Reloadable {
+
+	@Key( "server.app.name")
+    @DefaultValue("gm")
+    String appName();
 
     @Key( "server.secure" )
     @DefaultValue("false")
