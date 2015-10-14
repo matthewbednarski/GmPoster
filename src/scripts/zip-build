@@ -1,0 +1,24 @@
+#!/bin/bash
+
+dir=$(dirname "${BASH_SOURCE[0]}")
+
+cdold=$(pwd)
+out=$cdold/GmPoster.build.7z
+
+cd $dir
+cd ../..
+
+mvn clean package
+cd target
+
+7z a "$out" GmPoster-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+cd ../src/main/resources/com/mcb/owner
+cp Application.properties gm.properties
+
+7z a "$out" gm.properties
+
+rm -Rf gm.properties
+
+cd $cdold
+
