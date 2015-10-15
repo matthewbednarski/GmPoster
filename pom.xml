@@ -110,7 +110,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.mcb.App</mainClass>
+              <mainClass>com.mcb.GuiceMain</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
