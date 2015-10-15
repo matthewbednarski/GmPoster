@@ -1,7 +1,6 @@
-package com.mcb;
+package com.mcb.auth;
 
-import com.mcb.base.SparkFilter;
-import org.eclipse.jetty.http.HttpHeader;
+import com.mcb.base.SparkAuthFilter;
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -11,7 +10,6 @@ import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.util.security.Constraint;
 import spark.utils.StringUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -26,7 +24,7 @@ import static spark.Spark.*;
 /**
  * Created by matthewb on 10/14/15.
  */
-public class BasicAuthFilter extends SparkFilter {
+public class BasicAuthFilter extends SparkAuthFilter {
 
     @Override
     public void setup() {
@@ -71,7 +69,7 @@ public class BasicAuthFilter extends SparkFilter {
             });
             before("logout", (req, res) -> {
                 res.removeCookie("JSESSIONID");
-                res.header(HttpHeader.WWW_AUTHENTICATE.asString(), "basic realm=\"" + loginService.getName() + '"');
+//                res.header(HttpHeader.WWW_AUTHENTICATE.asString(), "basic realm=\"" + loginService.getName() + '"');
                 halt(401);
             });
         } catch (Exception e) {

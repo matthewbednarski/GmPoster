@@ -8,7 +8,7 @@ import static spark.Spark.before;
 /**
  * Created by matthewb on 10/14/15.
  */
-public class Cors  extends SparkFilter {
+public class CorsFilter extends SparkFilter {
 
     @Override
     public void setup() {
