@@ -87,7 +87,12 @@ public interface SparkAppConfig extends org.aeonbits.owner.Config,Reloadable {
     @Key( "app.remote.auth.password" )
 	String remoteAuthPassword();
 
+    @Key( "app.remote.auth.header.rename" )
+    @DefaultValue("")
+    String remoteAuthHeaderRename();
+
     @Key( "app.remote.auth.header" )
+    @DefaultValue("x-auth")
     String remoteAuthHeaderName();
     @Key( "app.remote.auth.header.value" )
     String remoteAuthHeaderValue();

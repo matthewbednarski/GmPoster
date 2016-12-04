@@ -3,6 +3,7 @@ package com.mcb;
 import com.mcb.base.SparkFilter;
 import com.ning.http.client.*;
 import com.ning.http.client.multipart.FilePart;
+import spark.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,17 @@ public class RePoster extends SparkFilter {
                 if (url == null || url == "") {
                     url = this.getCfg().remoteUrl();
                 }
-                ListenableFuture<Response> future = postIt(toPost, url);
+                String authHeaderName = this.getAuthHeaderName();
+                ListenableFuture<Response> future = null;
+                if(req.params().containsKey(authHeaderName)) {
+                    String authHeaderValue = req.queryParams(authHeaderName);
+                    if(!StringUtils.isEmpty(this.getAuthHeaderRename())){
+                       authHeaderName = this.getAuthHeaderRename();
+                    }
+                    future = postIt(toPost, url, authHeaderName, authHeaderValue);
+                }else{
+                    future = postIt(toPost, url);
+                }
                 if (future != null) {
                     Response r = future.get();
                     r.getCookies().stream().map(cookie -> {
@@ -98,6 +109,10 @@ public class RePoster extends SparkFilter {
         return this.getCfg().remoteAuthHeaderValue();
     }
 
+    private String getAuthHeaderRename() {
+        return this.getCfg().remoteAuthHeaderRename();
+    }
+
     /***
      * Returns a Credential to be used in a designated Authorization header
      * <p>
@@ -141,14 +156,39 @@ public class RePoster extends SparkFilter {
      * <p>
      * TODO: implement other Auth types
      *
-     * @param file
+     * @param @link Path file
+     * @param @link String url
      * @return a @link ListenableFuture<Response>
      */
     private ListenableFuture<Response> postIt(Path file, String url) {
+        return this.postIt(file, url, null, null);
+    }
+    /***
+     * Posts to the indicated url
+     * <p>
+     * TODO: implement other Auth types
+     *
+     * @param file
+     * @param authHeaderName
+     * @param authHeaderValue
+     * @return a @link ListenableFuture<Response>
+     */
+    private ListenableFuture<Response> postIt(Path file, String url, String authHeaderName, String authHeaderValue) {
         com.ning.http.client.AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient
                 .preparePost(url)
                 .setRequestTimeout(this.getCfg().requestTimeout())
                 .addBodyPart(new FilePart(file.getFileName().toString(), file.toFile()));
+        if(!StringUtils.isEmpty(authHeaderName) && !StringUtils.isEmpty(authHeaderValue)) {
+            builder.addHeader(authHeaderName, authHeaderValue);
+        } else {
+            Realm result = this.getAuthRealm();
+            if(result != null) {
+                builder.setRealm(result);
+            } else if(this.getAuthHeaderValue() != null && this.getAuthHeaderName() != null) {
+                builder.addHeader(this.getAuthHeaderName(), this.getAuthHeaderValue());
+            }
+        }
+
         Realm realm = getAuthRealm();
         if (realm != null) {
             builder.setRealm(realm);
