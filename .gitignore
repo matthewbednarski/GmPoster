@@ -46,17 +46,8 @@ Thumbs.db
 
 # Intelli            #
 ######################
-.idea/libraries/
-.idea/compiler.xml
-.idea/misc.xml
-.idea/vcs.xml
-.idea/dbnavigator.xml
-.idea/encodings.xml
-.idea/junitgenerator-prj-settings.xml
-.idea/uiDesigner.xml
-.idea/.name.xml
-.idea/workspace.xml
-.idea/tasks.xml
+.idea/
+
 
 # Java/Maven         #
 ######################
