@@ -1,16 +1,18 @@
 
 package com.mcb.owner;
 
+import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.HotReload;
 import org.aeonbits.owner.Config.HotReloadType;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.Reloadable;
 
-import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 
-@Sources({
+@Config.LoadPolicy(Config.LoadType.FIRST)
+@Sources(
+        {
         "file:${server.app.name}.properties",
         "file:~/${server.app.name}.properties",
         "file:/etc/${server.app.name}.properties",
@@ -50,6 +52,7 @@ public interface SparkAppConfig extends org.aeonbits.owner.Config,Reloadable {
     String[] serverAuthPaths();
 
 	@Key( "server.port" )
+    @DefaultValue("8080")
 	int port();
 
     @Key( "server.cors.disable" )
@@ -98,4 +101,15 @@ public interface SparkAppConfig extends org.aeonbits.owner.Config,Reloadable {
     @DefaultValue("${HOME}/${app.route.name}/files")
     String filesRoot();
 
+    @Config.Key( "server.request.timeout" )
+    @Config.DefaultValue( "90000" )
+    int requestTimeout();
+
+    @Config.Key( "server.read.timeout" )
+    @Config.DefaultValue( "60000" )
+    int readTimeout();
+
+    @Config.Key( "server.connection.timeout" )
+    @Config.DefaultValue( "10000" )
+    int connectionTimeout();
 }

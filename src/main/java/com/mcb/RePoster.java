@@ -4,6 +4,7 @@ import com.mcb.base.SparkFilter;
 import com.ning.http.client.*;
 import com.ning.http.client.multipart.FilePart;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,7 +21,15 @@ import static spark.Spark.get;
  */
 public class RePoster extends SparkFilter {
 
+    @Inject
+    AsyncHttpClientConfig.Builder config;
+
     public void setup() {
+        config
+                .setRequestTimeout(this.getCfg().requestTimeout())
+                .setConnectTimeout(this.getCfg().connectionTimeout())
+                .setReadTimeout(this.getCfg().readTimeout());
+        asyncHttpClient = new AsyncHttpClient(config.build());
         get("/" + this.getCfg().routeName(), (req, res) -> {
             log().log(Level.INFO, req.body());
             String file = req.queryParams("file");
@@ -67,7 +76,7 @@ public class RePoster extends SparkFilter {
         });
     }
 
-    AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    AsyncHttpClient asyncHttpClient;
 
     /***
      * Returns the name of the Authorization header
@@ -136,7 +145,9 @@ public class RePoster extends SparkFilter {
      * @return a @link ListenableFuture<Response>
      */
     private ListenableFuture<Response> postIt(Path file, String url) {
-        com.ning.http.client.AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(url)
+        com.ning.http.client.AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient
+                .preparePost(url)
+                .setRequestTimeout(this.getCfg().requestTimeout())
                 .addBodyPart(new FilePart(file.getFileName().toString(), file.toFile()));
         Realm realm = getAuthRealm();
         if (realm != null) {

@@ -43,6 +43,7 @@ public class SparkAppModule extends AbstractModule {
                 .create()
         );
         bind(SparkApp.class).to(App.class);
+        install(new HttpClientModule());
         install(new NoAuthModule());
         install(new CorsModule());
         install(new SSLConfigModule());
